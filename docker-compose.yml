@@ -1,0 +1,35 @@
+
+version: '3'
+
+services:
+  app:
+    container_name: devguild-tech-service
+    build:
+      context: .
+      dockerfile: Dockerfile-dev
+    depends_on:
+      - db
+    ports:
+      - 3000:3000
+    volumes:
+      - .:/home/app:cached
+      - ./package.json:/home/app/package.json:cached
+    networks: 
+      - devguild-tech-service-network
+
+  db:
+    image: postgres:9.4
+    container_name: devguild-tech-service-db
+    ports:
+      - 5432:5432
+    environment:
+      - POSTGRES_tech=devguild
+      - POSTGRES_PASSWORD=tech-service
+      - POSTGRES_DB=devguild-tech-db
+    networks:
+      - devguild-tech-service-network
+
+networks:
+  devguild-tech-service-network:
+    external:
+      name: default_services_network
