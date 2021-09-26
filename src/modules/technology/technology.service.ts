@@ -1,8 +1,10 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 import { FetchGithubService } from '../fetch/fetch-github.service';
+import { FetchUserService } from '../fetch/fetch-user.service';
 import { Technology } from './entities/technology.entity';
+import { ProcessTechnologyPayload } from './interfaces/process-technology.interface';
 
 @Injectable()
 export class TechnologyService {
@@ -10,6 +12,7 @@ export class TechnologyService {
     @InjectRepository(Technology)
     private readonly technologyRepository: Repository<Technology>,
     private readonly fetchGithubService: FetchGithubService,
+    private readonly fetchUserService: FetchUserService,
   ) {}
 
   async getTechnology(id: number): Promise<Technology> {
@@ -26,7 +29,11 @@ export class TechnologyService {
     return this.technologyRepository.find();
   }
 
-  async processUserTechnologies(github_id: number) {
+  async processUserTechnologies(
+    processTechnologyPayload: ProcessTechnologyPayload,
+  ): Promise<string[]> {
+    const { github_id, id } = processTechnologyPayload;
+
     const userRepositories = await this.fetchGithubService.getUserRepositories(
       github_id,
     );
@@ -39,6 +46,41 @@ export class TechnologyService {
       ),
     ];
 
-    console.log(technologiesArray);
+    const technologiesThatAlreadyExist = await this.technologyRepository.find({
+      where: {
+        name: In(technologiesArray),
+      },
+    });
+
+    const technologiesThatAlreadyExistNames = technologiesThatAlreadyExist.map(
+      (tech) => tech.name,
+    );
+
+    const technologiesToInsert = technologiesArray
+      .filter(
+        (technology) => !technologiesThatAlreadyExistNames.includes(technology),
+      )
+      .map((technology) => ({
+        name: technology,
+      }));
+
+    const insertedTechnologies = await this.technologyRepository.insert(
+      technologiesToInsert,
+    );
+
+    const technologiesIds = [
+      ...technologiesThatAlreadyExist.map((tech) => ({
+        technology_id: tech.id,
+      })),
+      ...insertedTechnologies.identifiers.map((identifier) => ({
+        technology_id: identifier.id,
+      })),
+    ];
+
+    await this.fetchUserService.insertTechnologiesInUser(id, {
+      technologies: technologiesIds,
+    });
+
+    return technologiesArray;
   }
 }

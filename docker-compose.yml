@@ -9,7 +9,7 @@ services:
     depends_on:
       - db
     ports:
-      - 4000:4000
+      - 5000:5000
     volumes:
       - .:/home/app:cached
       - ./package.json:/home/app/package.json:cached

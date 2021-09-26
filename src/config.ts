@@ -13,6 +13,7 @@ const REQUIRED_ENV_VARS = [
   'POSTGRES_USERNAME',
   'POSTGRES_PASSWORD',
   'POSTGRES_DATABASE',
+  'DEVGUILD_USER_SERVICE_URL',
 ];
 
 REQUIRED_ENV_VARS.forEach((envVar) => {
@@ -38,6 +39,8 @@ export const rabbitmq = {
   connectionString: `amqp://${process.env.RABBITMQ_HOST}`,
   technologiesProcessorQueue: process.env.TECHNOLOGIES_PROCESSOR_QUEUE,
 };
+
+export const userServiceURL = `http://${process.env.DEVGUILD_USER_SERVICE_URL}`;
 
 export const githubAPIUrl =
   process.env.GITHUB_API_URL || 'https://api.github.com';

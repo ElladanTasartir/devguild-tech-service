@@ -21,6 +21,11 @@ export class FetchGithubService {
   async getUserRepositories(id: number): Promise<UserRepositories[]> {
     const { data } = await this.client.get<UserRepositories[]>(
       `/user/${id}/repos`,
+      {
+        params: {
+          per_page: 100,
+        },
+      },
     );
 
     return data;

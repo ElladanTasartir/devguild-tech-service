@@ -1,13 +1,13 @@
 import { MigrationInterface, QueryRunner } from 'typeorm';
 
-export class InitDb1632622291251 implements MigrationInterface {
+export class AddIndexToName1632683452564 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query(
-      'CREATE TABLE technologies (id SERIAL PRIMARY KEY NOT NULL, name varchar NOT NULL)',
+      'CREATE INDEX idx_technologies_name ON technologies(name)',
     );
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
-    await queryRunner.query('DROP TABLE technologies');
+    await queryRunner.query('DROP INDEX idx_technologies_name');
   }
 }
