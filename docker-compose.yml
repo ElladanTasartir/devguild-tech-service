@@ -1,8 +1,7 @@
-
 version: '3'
 
 services:
-  app:
+  tech-service-app:
     container_name: devguild-tech-service
     build:
       context: .
@@ -10,20 +9,33 @@ services:
     depends_on:
       - db
     ports:
-      - 3000:3000
+      - 4000:4000
     volumes:
       - .:/home/app:cached
       - ./package.json:/home/app/package.json:cached
-    networks: 
+    networks:
       - devguild-tech-service-network
 
-  db:
+  rabbitmq-tech-service:
+    container_name: rabbitmq-tech-service
+    image: rabbitmq:3-management
+    environment: 
+      - RABBITMQ_DEFAULT_VHOST=tech-service
+      - RABBITMQ_DEFAULT_PASS=tech-service
+      - RABBITMQ_DEFAULT_USER=devguild
+    ports: 
+      - 5672:5672
+      - 15672:15672
+    networks:
+      - devguild-tech-service-network
+
+  db-tech-service:
     image: postgres:9.4
     container_name: devguild-tech-service-db
     ports:
       - 5432:5432
     environment:
-      - POSTGRES_tech=devguild
+      - POSTGRES_USER=devguild
       - POSTGRES_PASSWORD=tech-service
       - POSTGRES_DB=devguild-tech-db
     networks:
@@ -31,5 +43,4 @@ services:
 
 networks:
   devguild-tech-service-network:
-    external:
-      name: default_services_network
+    name: default_services_network

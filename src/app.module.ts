@@ -1,10 +1,22 @@
 import { Module } from '@nestjs/common';
+import { GraphQLModule } from '@nestjs/graphql';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { ApolloServerPluginLandingPageLocalDefault } from 'apollo-server-core';
 import { AppController } from './app.controller';
-import { AppService } from './app.service';
+import { TechnologyModule } from './modules/technology/technology.module';
+import { ormConfig } from './ormconfig';
 
 @Module({
-  imports: [],
+  imports: [
+    TypeOrmModule.forRoot(ormConfig),
+    TechnologyModule,
+    GraphQLModule.forRoot({
+      debug: true,
+      playground: false,
+      autoSchemaFile: 'schema.gql',
+      plugins: [ApolloServerPluginLandingPageLocalDefault()],
+    }),
+  ],
   controllers: [AppController],
-  providers: [AppService],
 })
 export class AppModule {}
