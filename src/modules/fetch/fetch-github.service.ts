@@ -10,16 +10,16 @@ interface UserRepositories {
 
 @Injectable()
 export class FetchGithubService {
-  private client: AxiosInstance;
+  private httpService: AxiosInstance;
 
   constructor() {
-    this.client = axios.create({
+    this.httpService = axios.create({
       baseURL: githubAPIUrl,
     });
   }
 
   async getUserRepositories(id: number): Promise<UserRepositories[]> {
-    const { data } = await this.client.get<UserRepositories[]>(
+    const { data } = await this.httpService.get<UserRepositories[]>(
       `/user/${id}/repos`,
       {
         params: {

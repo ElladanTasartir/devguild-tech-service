@@ -5,10 +5,10 @@ import { UsersTechnologies } from '../technology/interfaces/users-technologies.i
 
 @Injectable()
 export class FetchUserService {
-  private client: AxiosInstance;
+  private httpService: AxiosInstance;
 
   constructor() {
-    this.client = axios.create({
+    this.httpService = axios.create({
       baseURL: userServiceURL,
     });
   }
@@ -17,7 +17,7 @@ export class FetchUserService {
     id: string,
     usersTechnologies: UsersTechnologies,
   ): Promise<UsersTechnologies> {
-    const { data } = await this.client.post<UsersTechnologies>(
+    const { data } = await this.httpService.post<UsersTechnologies>(
       `/users/${id}/techs`,
       usersTechnologies,
     );
