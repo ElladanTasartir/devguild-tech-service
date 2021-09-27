@@ -7,8 +7,11 @@ export class TechnologyResolver {
   constructor(private readonly technologyService: TechnologyService) {}
 
   @Query(() => [Technology], { name: 'technologies' })
-  getTechnologies(): Promise<Technology[]> {
-    return this.technologyService.getTechnologies();
+  getTechnologies(
+    @Args('ids', { type: () => [Int], nullable: true })
+    ids: number[],
+  ): Promise<Technology[]> {
+    return this.technologyService.getTechnologies(ids);
   }
 
   @Query(() => Technology, { name: 'technology' })

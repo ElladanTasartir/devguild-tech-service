@@ -33,7 +33,7 @@ services:
     image: postgres:9.4
     container_name: devguild-tech-service-db
     ports:
-      - 5432:5432
+      - 5431:5432
     environment:
       - POSTGRES_USER=devguild
       - POSTGRES_PASSWORD=tech-service

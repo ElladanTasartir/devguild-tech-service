@@ -25,7 +25,15 @@ export class TechnologyService {
     return technology;
   }
 
-  getTechnologies(): Promise<Technology[]> {
+  getTechnologies(ids: number[]): Promise<Technology[]> {
+    if (ids && ids.length) {
+      return this.technologyRepository.find({
+        where: {
+          id: In(ids),
+        },
+      });
+    }
+
     return this.technologyRepository.find();
   }
 
