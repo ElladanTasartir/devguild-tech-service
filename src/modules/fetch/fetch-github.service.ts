@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import axios, { AxiosInstance } from 'axios';
-import { githubAPIUrl } from 'src/config';
+import { githubAPIUrl } from '../../config';
 
 interface UserRepositories {
   id: number;
