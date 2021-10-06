@@ -8,6 +8,15 @@ interface UserRepositories {
   language: string;
 }
 
+interface GithubUser {
+  login: string;
+  avatar_url: string;
+  bio: string;
+  location: string;
+  followers: number;
+  following: number;
+}
+
 @Injectable()
 export class FetchGithubService {
   private httpService: AxiosInstance;
@@ -16,6 +25,12 @@ export class FetchGithubService {
     this.httpService = axios.create({
       baseURL: githubAPIUrl,
     });
+  }
+
+  async getUserInfo(id: number): Promise<GithubUser> {
+    const { data } = await this.httpService.get<GithubUser>(`/user/${id}`);
+
+    return data;
   }
 
   async getUserRepositories(id: number): Promise<UserRepositories[]> {

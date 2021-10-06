@@ -1,13 +1,26 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import * as dayjs from 'dayjs';
 import { In, Repository } from 'typeorm';
 import { FetchGithubService } from '../fetch/fetch-github.service';
 import { FetchUserService } from '../fetch/fetch-user.service';
 import { Technology } from './entities/technology.entity';
 import { ProcessTechnologyPayload } from './interfaces/process-technology.interface';
+import { User } from './interfaces/user';
+
+const requiredFields = [
+  'bio',
+  'location',
+  'following',
+  'followers',
+  'login',
+  'avatar_url',
+];
 
 @Injectable()
 export class TechnologyService {
+  private logger = new Logger('ProcessUserInfo');
+
   constructor(
     @InjectRepository(Technology)
     private readonly technologyRepository: Repository<Technology>,
@@ -35,6 +48,37 @@ export class TechnologyService {
     }
 
     return this.technologyRepository.find();
+  }
+
+  async processUserInfo(user: User): Promise<void> {
+    const { id, github_id } = user;
+
+    const createdDateTimeRange = dayjs(user.created_at).add(2, 'minutes');
+
+    const updatedTime = dayjs(user.updated_at);
+
+    const updatedTimeIsInTimeRange = updatedTime.isBefore(createdDateTimeRange);
+
+    const yesterday = dayjs(Date.now()).subtract(1, 'day').endOf('day');
+
+    if (!(updatedTimeIsInTimeRange || updatedTime.isBefore(yesterday))) {
+      this.logger.verbose(`User has already been updated today`);
+      return;
+    }
+
+    const githubUser = await this.fetchGithubService.getUserInfo(github_id);
+
+    const fieldsToUpdate = {};
+
+    for (const field of requiredFields) {
+      if (user[field] !== githubUser[field]) {
+        fieldsToUpdate[field] = githubUser[field];
+      }
+    }
+
+    await this.fetchUserService.updateUserInfo(id, fieldsToUpdate);
+
+    this.logger.verbose(`User "${user.id}" has been updated`);
   }
 
   async processUserTechnologies(
