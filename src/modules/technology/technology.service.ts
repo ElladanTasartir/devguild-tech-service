@@ -76,7 +76,10 @@ export class TechnologyService {
       }
     }
 
-    await this.fetchUserService.updateUserInfo(id, fieldsToUpdate);
+    await this.fetchUserService.updateUserInfo(id, {
+      ...fieldsToUpdate,
+      updated_at: new Date(Date.now()),
+    });
 
     this.logger.verbose(`User "${user.id}" has been updated`);
   }

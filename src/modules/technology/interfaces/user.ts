@@ -10,5 +10,5 @@ export interface User {
   following: number;
   location: string;
   created_at: string;
-  updated_at: string;
+  updated_at: string | Date;
 }
