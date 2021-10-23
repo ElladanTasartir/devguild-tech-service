@@ -1,10 +1,16 @@
-import { Injectable, Logger, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  Logger,
+  NotFoundException,
+  UnprocessableEntityException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import * as dayjs from 'dayjs';
 import { In, Repository } from 'typeorm';
 import { FetchGithubService } from '../fetch/fetch-github.service';
 import { FetchUserService } from '../fetch/fetch-user.service';
 import { Technology } from './entities/technology.entity';
+import { CreateTechnologyInput } from './inputs/create-technology.input';
 import { ProcessTechnologyPayload } from './interfaces/process-technology.interface';
 import { User } from './interfaces/user';
 
@@ -50,6 +56,30 @@ export class TechnologyService {
     return this.technologyRepository.find();
   }
 
+  async createTechnology(
+    createTechnologyInput: CreateTechnologyInput,
+  ): Promise<Technology> {
+    const { name } = createTechnologyInput;
+
+    const foundTechnology = await this.technologyRepository.findOne({
+      where: {
+        name,
+      },
+    });
+
+    if (foundTechnology) {
+      throw new UnprocessableEntityException(
+        `Technology with name "${name}" already exists`,
+      );
+    }
+
+    const createdTechnology = this.technologyRepository.create(
+      createTechnologyInput,
+    );
+
+    return this.technologyRepository.save(createdTechnology);
+  }
+
   async processUserInfo(user: User): Promise<void> {
     const { id, github_id } = user;
 
@@ -79,6 +109,11 @@ export class TechnologyService {
     await this.fetchUserService.updateUserInfo(id, {
       ...fieldsToUpdate,
       updated_at: new Date(Date.now()),
+    });
+
+    await this.processUserTechnologies({
+      id,
+      github_id,
     });
 
     this.logger.verbose(`User "${user.id}" has been updated`);
