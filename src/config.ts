@@ -36,7 +36,7 @@ export const postgres = {
 };
 
 export const rabbitmq = {
-  connectionString: `amqp://${process.env.RABBITMQ_HOST}`,
+  connectionString: process.env.RABBITMQ_HOST,
   technologiesProcessorQueue: process.env.TECHNOLOGIES_PROCESSOR_QUEUE,
 };
 
