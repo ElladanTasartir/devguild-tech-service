@@ -56,7 +56,11 @@ export class TechnologyService {
       });
     }
 
-    return this.technologyRepository.find();
+    return this.technologyRepository.find({
+      order: {
+        name: 'ASC',
+      },
+    });
   }
 
   async createTechnology(
