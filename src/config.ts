@@ -40,7 +40,7 @@ export const rabbitmq = {
   technologiesProcessorQueue: process.env.TECHNOLOGIES_PROCESSOR_QUEUE,
 };
 
-export const userServiceURL = `http://${process.env.DEVGUILD_USER_SERVICE_URL}`;
+export const userServiceURL = process.env.DEVGUILD_USER_SERVICE_URL;
 
 export const githubAPIUrl =
   process.env.GITHUB_API_URL || 'https://api.github.com';
