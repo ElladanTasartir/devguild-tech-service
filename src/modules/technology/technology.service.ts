@@ -50,6 +50,9 @@ export class TechnologyService {
         where: {
           id: In(ids),
         },
+        order: {
+          name: 'ASC',
+        },
       });
     }
 
